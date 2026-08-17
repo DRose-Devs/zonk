@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zonk Brand Guidelines</title>
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--zonk-font-display);
+      background: var(--zonk-bg);
+      color: var(--zonk-text);
+      line-height: var(--zonk-leading-normal);
+    }
+
+    /* ── Hero ───────────────────────────────── */
+    .hero {
+      background: var(--zonk-teal);
+      color: #fff;
+      padding: var(--zonk-space-12) var(--zonk-gutter) var(--zonk-space-11);
+      border-radius: 0 0 var(--zonk-radius-xl) var(--zonk-radius-xl);
+    }
+    .hero h1 {
+      font-size: var(--zonk-text-3xl);
+      font-weight: 400;
+      letter-spacing: var(--zonk-tracking-tight);
+      line-height: var(--zonk-leading-tight);
+      margin-bottom: var(--zonk-space-5);
+    }
+    .hero .subtitle {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-sm);
+      letter-spacing: var(--zonk-tracking-wide);
+      text-transform: uppercase;
+      color: var(--zonk-lime);
+    }
+
+    /* ── Container ──────────────────────────── */
+    .container {
+      max-width: var(--zonk-max-width);
+      margin: 0 auto;
+      padding: 0 var(--zonk-gutter);
+    }
+
+    /* ── Section ────────────────────────────── */
+    section {
+      padding: var(--zonk-space-11) 0;
+      border-bottom: 1px solid var(--zonk-sage);
+    }
+    section:last-child { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      letter-spacing: var(--zonk-tracking-wide);
+      text-transform: uppercase;
+      color: var(--zonk-slate);
+      margin-bottom: var(--zonk-space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--zonk-space-3);
+    }
+    .section-label::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--zonk-teal);
+      display: inline-block;
+    }
+
+    h2 {
+      font-size: var(--zonk-text-2xl);
+      font-weight: 400;
+      letter-spacing: var(--zonk-tracking-tight);
+      line-height: var(--zonk-leading-tight);
+      margin-bottom: var(--zonk-space-8);
+    }
+
+    h3 {
+      font-size: var(--zonk-text-xl);
+      font-weight: 400;
+      letter-spacing: var(--zonk-tracking-tight);
+      margin-bottom: var(--zonk-space-5);
+    }
+
+    p {
+      max-width: 620px;
+      color: var(--zonk-text-muted);
+      margin-bottom: var(--zonk-space-5);
+    }
+
+    /* ── Color Swatches ─────────────────────── */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--zonk-space-5);
+    }
+    .swatch {
+      border-radius: var(--zonk-radius-md);
+      overflow: hidden;
+      box-shadow: var(--zonk-shadow-sm);
+      border: 1px solid var(--zonk-sage);
+    }
+    .swatch-color {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      padding: var(--zonk-space-3);
+    }
+    .swatch-info {
+      padding: var(--zonk-space-3) var(--zonk-space-4);
+    }
+    .swatch-name {
+      font-weight: 500;
+      font-size: var(--zonk-text-sm);
+      margin-bottom: 2px;
+    }
+    .swatch-value {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      color: var(--zonk-text-muted);
+    }
+
+    /* ── Typography Samples ─────────────────── */
+    .type-sample {
+      margin-bottom: var(--zonk-space-8);
+      padding-bottom: var(--zonk-space-8);
+      border-bottom: 1px solid var(--zonk-bg-alt);
+    }
+    .type-sample:last-child { border-bottom: none; }
+    .type-meta {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      color: var(--zonk-text-muted);
+      margin-bottom: var(--zonk-space-3);
+    }
+
+    /* ── Buttons ────────────────────────────── */
+    .btn-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--zonk-space-4);
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--zonk-space-2);
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      letter-spacing: var(--zonk-tracking-wide);
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: var(--zonk-space-3) var(--zonk-space-5);
+      border-radius: var(--zonk-radius-sm);
+      cursor: pointer;
+      border: none;
+      transition: all var(--zonk-duration) var(--zonk-ease);
+    }
+    .btn-primary {
+      background: var(--zonk-text);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--zonk-teal); }
+    .btn-accent {
+      background: var(--zonk-lime);
+      color: var(--zonk-text);
+    }
+    .btn-accent:hover { background: var(--zonk-lime-hover); }
+    .btn-outline {
+      background: transparent;
+      color: var(--zonk-text);
+      border: 1px solid var(--zonk-sage);
+    }
+    .btn-outline:hover { border-color: var(--zonk-teal); color: var(--zonk-teal); }
+    .btn-icon {
+      background: var(--zonk-lime);
+      color: var(--zonk-text);
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--zonk-radius-sm);
+      font-size: 16px;
+    }
+
+    /* ── Component Previews ─────────────────── */
+    .preview-dark {
+      background: var(--zonk-teal);
+      border-radius: var(--zonk-radius-lg);
+      padding: var(--zonk-space-8);
+      color: #fff;
+    }
+
+    .preview-card {
+      background: var(--zonk-bg);
+      border-radius: var(--zonk-radius-md);
+      padding: var(--zonk-space-5);
+      box-shadow: var(--zonk-shadow-md);
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--zonk-space-4);
+      margin-top: var(--zonk-space-5);
+    }
+    .kpi-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--zonk-radius-md);
+      padding: var(--zonk-space-4);
+    }
+    .kpi-label {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      letter-spacing: var(--zonk-tracking-wide);
+      text-transform: uppercase;
+      color: var(--zonk-sage);
+      margin-bottom: var(--zonk-space-2);
+    }
+    .kpi-value {
+      font-size: var(--zonk-text-xl);
+      font-weight: 400;
+      letter-spacing: var(--zonk-tracking-tight);
+    }
+    .kpi-value.positive { color: var(--zonk-lime); }
+    .kpi-value.negative { color: var(--zonk-negative); }
+
+    /* ── Table Preview ──────────────────────── */
+    .table-preview {
+      margin-top: var(--zonk-space-5);
+      overflow-x: auto;
+    }
+    .zonk-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--zonk-text-sm);
+    }
+    .zonk-table th {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      letter-spacing: var(--zonk-tracking-wide);
+      text-transform: uppercase;
+      text-align: left;
+      padding: var(--zonk-space-3) var(--zonk-space-4);
+      border-bottom: 2px solid var(--zonk-teal);
+      color: var(--zonk-slate);
+      background: var(--zonk-bg-alt);
+    }
+    .zonk-table td {
+      padding: var(--zonk-space-3) var(--zonk-space-4);
+      border-bottom: 1px solid var(--zonk-sage);
+      vertical-align: top;
+    }
+    .zonk-table tr:hover td {
+      background: rgba(62, 91, 99, 0.04);
+    }
+
+    /* ── Pills / Badges ─────────────────────── */
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      padding: 2px 10px;
+      border-radius: 999px;
+      letter-spacing: var(--zonk-tracking-wide);
+    }
+    .pill-teal { background: rgba(62,91,99,0.12); color: var(--zonk-teal); }
+    .pill-lime { background: rgba(198,231,88,0.2); color: var(--zonk-positive-text); }
+    .pill-sky  { background: rgba(95,196,227,0.15); color: var(--zonk-info-text); }
+    .pill-warn { background: rgba(245,166,35,0.15); color: var(--zonk-warning-text); }
+    .pill-bad  { background: rgba(232,93,93,0.12); color: var(--zonk-negative-text); }
+
+    .pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--zonk-space-3);
+      margin-top: var(--zonk-space-4);
+    }
+
+    /* ── Semantic Color Blocks ──────────────── */
+    .semantic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--zonk-space-4);
+      margin-top: var(--zonk-space-5);
+    }
+    .semantic-card {
+      border-radius: var(--zonk-radius-md);
+      padding: var(--zonk-space-4);
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-sm);
+    }
+    .semantic-card.positive { background: rgba(198,231,88,0.15); color: var(--zonk-positive-text); border: 1px solid rgba(198,231,88,0.3); }
+    .semantic-card.warning  { background: rgba(245,166,35,0.12); color: var(--zonk-warning-text); border: 1px solid rgba(245,166,35,0.25); }
+    .semantic-card.negative { background: rgba(232,93,93,0.1); color: var(--zonk-negative-text); border: 1px solid rgba(232,93,93,0.25); }
+    .semantic-card.info     { background: rgba(95,196,227,0.1); color: var(--zonk-info-text); border: 1px solid rgba(95,196,227,0.25); }
+
+    /* ── Footer ─────────────────────────────── */
+    footer {
+      background: var(--zonk-teal);
+      color: #fff;
+      padding: var(--zonk-space-8) var(--zonk-gutter);
+      border-radius: var(--zonk-radius-xl) var(--zonk-radius-xl) 0 0;
+      margin-top: var(--zonk-space-12);
+    }
+    footer .footer-inner {
+      max-width: var(--zonk-max-width);
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer .brand {
+      font-size: var(--zonk-text-xl);
+      letter-spacing: var(--zonk-tracking-tight);
+    }
+    footer .meta {
+      font-family: var(--zonk-font-mono);
+      font-size: var(--zonk-text-xs);
+      color: var(--zonk-sage);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- HERO                                            -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="container">
+    <div class="subtitle">Brand Guidelines</div>
+    <h1>zonk</h1>
+    <p style="color: var(--zonk-sage); max-width: 600px;">
+      Visual identity system for quantitative strategy research reports.
+      Derived from the radial.org design language &mdash; adapted for
+      data-dense financial reporting.
+    </p>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- COLORS                                          -->
+<!-- ════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Color Palette</div>
+  <h2>Brand colors.</h2>
+  <p>Seven core colors anchored by Radial's teal and lime. Extended with semantic
+    colors for financial data (positive/negative/warning/info).</p>
+
+  <h3>Primary Palette</h3>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background: #3e5b63;">
+        <span style="color:#fff; font-family: var(--zonk-font-mono); font-size: 11px;">Primary</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Teal</div>
+        <div class="swatch-value">--zonk-teal · #3e5b63</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #2e454c;">
+        <span style="color:#fff; font-family: var(--zonk-font-mono); font-size: 11px;">Deep</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Teal Deep</div>
+        <div class="swatch-value">--zonk-teal-deep · #2e454c</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #c6e758;">
+        <span style="color:#1e1e1e; font-family: var(--zonk-font-mono); font-size: 11px;">Accent</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Lime</div>
+        <div class="swatch-value">--zonk-lime · #c6e758</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #5fc4e3;">
+        <span style="color:#1e1e1e; font-family: var(--zonk-font-mono); font-size: 11px;">Highlight</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Sky</div>
+        <div class="swatch-value">--zonk-sky · #5fc4e3</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #4a5760;">
+        <span style="color:#fff; font-family: var(--zonk-font-mono); font-size: 11px;">Secondary</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Slate</div>
+        <div class="swatch-value">--zonk-slate · #4a5760</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #c7cdc8;">
+        <span style="color:#1e1e1e; font-family: var(--zonk-font-mono); font-size: 11px;">Neutral</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Sage</div>
+        <div class="swatch-value">--zonk-sage · #c7cdc8</div>
+      </div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #1e1e1e;">
+        <span style="color:#fff; font-family: var(--zonk-font-mono); font-size: 11px;">Text</span>
+      </div>
+      <div class="swatch-info">
+        <div class="swatch-name">Ink</div>
+        <div class="swatch-value">--zonk-text · #1e1e1e</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: var(--zonk-space-8);">Semantic Colors</h3>
+  <p>Financial data needs clear positive/negative signals at a glance.</p>
+  <div class="semantic-grid">
+    <div class="semantic-card positive">Positive &mdash; CAGR, Sharpe &gt; 1, gains<br><strong>#c6e758</strong></div>
+    <div class="semantic-card warning">Warning &mdash; moderate drawdown, mixed signals<br><strong>#f5a623</strong></div>
+    <div class="semantic-card negative">Negative &mdash; losses, high drawdown, failures<br><strong>#e85d5d</strong></div>
+    <div class="semantic-card info">Info &mdash; notes, metadata, source links<br><strong>#5fc4e3</strong></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- TYPOGRAPHY                                      -->
+<!-- ════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Typography</div>
+  <h2>Two typefaces. Clear hierarchy.</h2>
+  <p>Helvetica Now Display for headlines and body. DM Mono for data, labels, and code.
+    The pairing mirrors radial.org's dual-font system.</p>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-display &middot; 86px &middot; tracking: -0.02em</div>
+    <div style="font-size: var(--zonk-text-3xl); letter-spacing: var(--zonk-tracking-tight); line-height: var(--zonk-leading-tight);">
+      Hero Headline
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-display &middot; 42px &middot; tracking: -0.02em</div>
+    <div style="font-size: var(--zonk-text-2xl); letter-spacing: var(--zonk-tracking-tight); line-height: var(--zonk-leading-tight);">
+      Section Title
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-display &middot; 28px &middot; tracking: -0.02em</div>
+    <div style="font-size: var(--zonk-text-xl); letter-spacing: var(--zonk-tracking-tight);">
+      Subsection Header
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-display &middot; 20px &middot; body lead</div>
+    <div style="font-size: var(--zonk-text-lg); color: var(--zonk-text-muted);">
+      Lead paragraph text for introductory content and strategy descriptions.
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-display &middot; 16px &middot; body</div>
+    <div style="font-size: var(--zonk-text-base);">
+      Standard body text for detailed explanations, rationale, and methodology notes.
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-mono &middot; 13px &middot; table data</div>
+    <div style="font-family: var(--zonk-font-mono); font-size: var(--zonk-text-sm);">
+      CAGR: 33.4% &nbsp; Sharpe: 0.854 &nbsp; MaxDD: -31.2% &nbsp; VaR95: -0.06%
+    </div>
+  </div>
+
+  <div class="type-sample">
+    <div class="type-meta">--zonk-font-mono &middot; 11px &middot; uppercase label / tracking: 0.08em</div>
+    <div style="font-family: var(--zonk-font-mono); font-size: var(--zonk-text-xs); letter-spacing: var(--zonk-tracking-wide); text-transform: uppercase; color: var(--zonk-slate);">
+      Strategy Performance &middot; Train Window &middot; Test Window
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- COMPONENTS                                      -->
+<!-- ════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Components</div>
+  <h2>Buttons, pills, and cards.</h2>
+
+  <h3>Buttons</h3>
+  <div class="btn-grid">
+    <button class="btn btn-primary">View Report</button>
+    <button class="btn btn-accent">Run Strategy</button>
+    <button class="btn btn-outline">Export CSV</button>
+    <button class="btn btn-icon">&DownArrowBar;</button>
+  </div>
+
+  <h3 style="margin-top: var(--zonk-space-8);">Pills &amp; Badges</h3>
+  <div class="pills-row">
+    <span class="pill pill-teal">paper-research</span>
+    <span class="pill pill-lime">Sharpe &gt; 1.0</span>
+    <span class="pill pill-sky">rsi_reversion</span>
+    <span class="pill pill-warn">MaxDD &gt; 30%</span>
+    <span class="pill pill-bad">Failed</span>
+  </div>
+
+  <h3 style="margin-top: var(--zonk-space-8);">KPI Cards (Dark Panel)</h3>
+  <div class="preview-dark">
+    <div style="font-family: var(--zonk-font-mono); font-size: var(--zonk-text-xs); letter-spacing: var(--zonk-tracking-wide); text-transform: uppercase; color: var(--zonk-sage); margin-bottom: var(--zonk-space-4);">
+      Autoresearch Loop &mdash; Top 10 Results
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Candidates</div>
+        <div class="kpi-value">100</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Best CAGR</div>
+        <div class="kpi-value positive">33.4%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Sharpe</div>
+        <div class="kpi-value positive">0.72</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Worst MaxDD</div>
+        <div class="kpi-value negative">-42.1%</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top: var(--zonk-space-8);">Data Table</h3>
+  <div class="table-preview">
+    <table class="zonk-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Strategy</th>
+          <th>Asset</th>
+          <th>Rule</th>
+          <th>CAGR</th>
+          <th>Sharpe</th>
+          <th>MaxDD</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-family: var(--zonk-font-mono);">1</td>
+          <td>paper-research</td>
+          <td><span class="pill pill-teal">TQQQ</span></td>
+          <td>rsi_reversion</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-positive-text);">33.4%</td>
+          <td style="font-family: var(--zonk-font-mono);">0.854</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-negative-text);">-31.2%</td>
+          <td style="font-family: var(--zonk-font-mono); font-weight: 500;">3.44</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--zonk-font-mono);">2</td>
+          <td>paper-research</td>
+          <td><span class="pill pill-teal">TQQQ</span></td>
+          <td>rsi_reversion</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-positive-text);">19.1%</td>
+          <td style="font-family: var(--zonk-font-mono);">0.646</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-negative-text);">-29.4%</td>
+          <td style="font-family: var(--zonk-font-mono); font-weight: 500;">2.79</td>
+        </tr>
+        <tr>
+          <td style="font-family: var(--zonk-font-mono);">3</td>
+          <td>paper-research</td>
+          <td><span class="pill pill-sky">SPY</span></td>
+          <td>ma_crossover</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-positive-text);">14.8%</td>
+          <td style="font-family: var(--zonk-font-mono);">0.512</td>
+          <td style="font-family: var(--zonk-font-mono); color: var(--zonk-negative-text);">-18.7%</td>
+          <td style="font-family: var(--zonk-font-mono); font-weight: 500;">2.31</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- LAYOUT                                          -->
+<!-- ════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Layout</div>
+  <h2>Spacing &amp; structure.</h2>
+  <p>Reports use the Radial grid system: 1540px max-width, fluid gutter
+    (20px&ndash;40px), with generous vertical rhythm.</p>
+
+  <div style="display: flex; gap: var(--zonk-space-2); align-items: flex-end; margin-top: var(--zonk-space-5); flex-wrap: wrap;">
+    <div style="width:20px; height:20px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">4</span>
+    </div>
+    <div style="width:28px; height:28px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">8</span>
+    </div>
+    <div style="width:36px; height:36px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">12</span>
+    </div>
+    <div style="width:44px; height:44px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">16</span>
+    </div>
+    <div style="width:52px; height:52px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">20</span>
+    </div>
+    <div style="width:64px; height:64px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">24</span>
+    </div>
+    <div style="width:80px; height:80px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">32</span>
+    </div>
+    <div style="width:96px; height:96px; background:var(--zonk-teal); border-radius:4px; display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:9px;color:#fff;">40</span>
+    </div>
+  </div>
+
+  <h3 style="margin-top: var(--zonk-space-8);">Border Radius</h3>
+  <div style="display: flex; gap: var(--zonk-space-5); margin-top: var(--zonk-space-4); flex-wrap: wrap;">
+    <div style="width:80px;height:80px;background:var(--zonk-sage);border-radius:var(--zonk-radius-sm);display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:10px;">6px</span>
+    </div>
+    <div style="width:80px;height:80px;background:var(--zonk-sage);border-radius:var(--zonk-radius-md);display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:10px;">10px</span>
+    </div>
+    <div style="width:80px;height:80px;background:var(--zonk-sage);border-radius:var(--zonk-radius-lg);display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:10px;">16px</span>
+    </div>
+    <div style="width:80px;height:80px;background:var(--zonk-sage);border-radius:var(--zonk-radius-xl);display:flex;align-items:center;justify-content:center;">
+      <span style="font-family:var(--zonk-font-mono);font-size:10px;">24px</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- USAGE NOTES                                     -->
+<!-- ════════════════════════════════════════════════ -->
+<section>
+  <div class="section-label">Usage Notes</div>
+  <h2>Implementation.</h2>
+
+  <h3>Fonts</h3>
+  <p><strong>Helvetica Now Display</strong> &mdash; proprietary (Monotype). If not installed,
+    the system font stack provides near-identical rendering on macOS/Windows/Linux.
+    No license required for local report generation.</p>
+  <p><strong>DM Mono</strong> &mdash; loaded from Google Fonts via the tokens.css import.
+    Used for all numerical data, labels, and monospace elements.</p>
+
+  <h3 style="margin-top: var(--zonk-space-6);">How to use</h3>
+  <p>Include <code style="font-family:var(--zonk-font-mono);background:var(--zonk-bg-alt);padding:2px 6px;border-radius:4px;">tokens.css</code>
+    in your HTML report, or inline the <code style="font-family:var(--zonk-font-mono);background:var(--zonk-bg-alt);padding:2px 6px;border-radius:4px;">:root</code>
+    block. Then reference tokens as <code style="font-family:var(--zonk-font-mono);background:var(--zonk-bg-alt);padding:2px 6px;border-radius:4px;">var(--zonk-teal)</code>, etc.</p>
+  <p>See <code style="font-family:var(--zonk-font-mono);background:var(--zonk-bg-alt);padding:2px 6px;border-radius:4px;">report-template.html</code>
+    for the ready-to-use autoresearch report template.</p>
+</section>
+
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- FOOTER                                          -->
+<!-- ════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="brand">zonk</div>
+    <div class="meta">Quantitative Strategy Research &middot; Brand Guidelines v1.0</div>
+  </div>
+</footer>
+
+</body>
+</html>

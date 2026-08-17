@@ -1,0 +1,23 @@
+# Rust
+target/
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Output artifacts
+output/
+reports/
+
+# Environment
+.env
+
+# OS
+.DS_Store
+.pytest_cache/
+.ruff_cache/
+DESIGN_MEMORY.md
+DESIGN_PLAN.md

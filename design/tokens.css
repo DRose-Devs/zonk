@@ -1,0 +1,97 @@
+/*
+ * zonk Design Tokens
+ * Editorial Intelligence system
+ * --------------------------------------------------
+ * Usage: <link rel="stylesheet" href="tokens.css">
+ *        or copy :root block into your <style> tag
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root {
+  /* ── Core Surfaces ────────────────────────────── */
+  --zonk-surface:                 #f3fbf8;
+  --zonk-surface-container-low:   #edf5f2;
+  --zonk-surface-container:       #e5edeb;
+  --zonk-surface-container-high:  #dce4e1;
+  --zonk-surface-container-lowest:#ffffff;
+  --zonk-on-surface:              #151d1c;
+  --zonk-on-surface-muted:        #4e635c;
+
+  /* ── Editorial Brand ─────────────────────────── */
+  --zonk-primary:                 #003434;
+  --zonk-primary-container:       #004d4d;
+  --zonk-secondary:               #4e635c;
+  --zonk-secondary-container:     #cee5dc;
+  --zonk-outline:                 #6f7978;
+  --zonk-outline-variant:         #bfc8c8;
+  --zonk-accent-lime:             #c3f400;
+
+  /* ── Compatibility Aliases ───────────────────── */
+  --zonk-bg:                      var(--zonk-surface);
+  --zonk-bg-alt:                  var(--zonk-surface-container-low);
+  --zonk-bg-surface:              var(--zonk-surface-container);
+  --zonk-text:                    var(--zonk-on-surface);
+  --zonk-text-muted:              var(--zonk-on-surface-muted);
+  --zonk-teal:                    var(--zonk-primary);
+  --zonk-teal-deep:               var(--zonk-primary-container);
+  --zonk-lime:                    var(--zonk-accent-lime);
+  --zonk-sky:                     #7aa7a1;
+  --zonk-slate:                   var(--zonk-secondary);
+  --zonk-sage:                    var(--zonk-outline-variant);
+  --zonk-positive-text:           #3d5a00;
+  --zonk-negative-text:           #6b2f2f;
+  --zonk-info-text:               var(--zonk-primary-container);
+
+  /* ── Typography ──────────────────────────────── */
+  --zonk-font-display:            "Newsreader", Georgia, "Times New Roman", serif;
+  --zonk-font-body:               "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --zonk-font-data:               "Space Grotesk", "Inter", sans-serif;
+  --zonk-font-mono:               var(--zonk-font-data);
+
+  /* ── Type Scale ──────────────────────────────── */
+  --zonk-text-xs:                 0.6875rem;
+  --zonk-text-sm:                 0.8125rem;
+  --zonk-text-base:               1rem;
+  --zonk-text-lg:                 1.25rem;
+  --zonk-text-xl:                 1.75rem;
+  --zonk-text-2xl:                2.625rem;
+  --zonk-text-3xl:                5.375rem;
+  --zonk-leading-tight:           1.0;
+  --zonk-leading-snug:            1.2;
+  --zonk-leading-normal:          1.5;
+  --zonk-tracking-tight:          -0.02em;
+  --zonk-tracking-normal:         0;
+  --zonk-tracking-wide:           0.05rem;
+
+  /* ── Spacing ─────────────────────────────────── */
+  --zonk-space-1:                 4px;
+  --zonk-space-2:                 8px;
+  --zonk-space-3:                 12px;
+  --zonk-space-4:                 16px;
+  --zonk-space-5:                 20px;
+  --zonk-space-6:                 24px;
+  --zonk-space-7:                 32px;
+  --zonk-space-8:                 40px;
+  --zonk-space-9:                 48px;
+  --zonk-space-10:                64px;
+  --zonk-space-11:                80px;
+  --zonk-space-12:                100px;
+
+  /* ── Layout ──────────────────────────────────── */
+  --zonk-max-width:               1540px;
+  --zonk-gutter:                  clamp(20px, calc(12px + 1.8vw), 40px);
+  --zonk-radius-sm:               0px;
+  --zonk-radius-md:               0px;
+  --zonk-radius-lg:               0px;
+  --zonk-radius-xl:               0px;
+
+  /* ── Shadows / Elevation ─────────────────────── */
+  --zonk-shadow-sm:               0 24px 48px -12px rgba(21, 29, 28, 0.04);
+  --zonk-shadow-md:               0 24px 48px -12px rgba(21, 29, 28, 0.04);
+  --zonk-shadow-lg:               0 24px 48px -12px rgba(21, 29, 28, 0.04);
+
+  /* ── Transitions ─────────────────────────────── */
+  --zonk-ease:                    cubic-bezier(0.2, 0.8, 0.2, 1);
+  --zonk-duration:                220ms;
+}

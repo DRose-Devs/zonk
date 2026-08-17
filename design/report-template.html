@@ -1,0 +1,2118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zonk Strategy Frontier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --surface: #f3fbf8;
+      --surface-container-low: #edf5f2;
+      --surface-container: #e8f0ed;
+      --surface-container-high: #dce4e1;
+      --surface-container-lowest: #ffffff;
+      --on-surface: #151d1c;
+      --on-surface-muted: #4e635c;
+      --on-surface-soft: #6f7978;
+      --primary: #003434;
+      --primary-container: #004d4d;
+      --secondary: #4e635c;
+      --secondary-container: #cee5dc;
+      --outline: #6f7978;
+      --outline-variant: #bfc8c8;
+      --accent-lime: #c3f400;
+      --accent-lime-deep: #abd600;
+      --ink-dark: #161e00;
+      --shadow: 0 24px 48px -12px rgba(21, 29, 28, 0.04);
+      --glass: rgba(243, 251, 248, 0.8);
+      --ghost-line: rgba(191, 200, 200, 0.2);
+      --ghost-line-strong: rgba(191, 200, 200, 0.3);
+      --transition: 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, var(--surface) 0%, var(--surface-container-low) 100%);
+      color: var(--on-surface);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background:
+        radial-gradient(circle at top left, rgba(206, 229, 220, 0.42) 0%, transparent 24%),
+        radial-gradient(circle at top right, rgba(195, 244, 0, 0.12) 0%, transparent 18%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .mono,
+    .mini-kicker,
+    .section-label,
+    .telemetry-key,
+    .window-period,
+    .nav-link,
+    .nav-footer-link,
+    .metric-card-label,
+    .pill,
+    .candidate-code,
+    .candidate-score-label,
+    .candidate-select,
+    .config-label,
+    .command-shell,
+    .evidence-link {
+      font-family: "Space Grotesk", "Inter", sans-serif;
+    }
+
+    .page-shell {
+      display: grid;
+      grid-template-columns: 288px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidenav {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 96px 16px 32px;
+      background: var(--surface-container-low);
+    }
+
+    .sidenav-brand {
+      padding: 0 16px 40px;
+    }
+
+    .sidenav-title {
+      margin: 0;
+      color: var(--primary);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 24px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 32px;
+    }
+
+    .sidenav-tag {
+      margin: 4px 0 0;
+      color: var(--secondary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .sidenav-nav,
+    .sidenav-footer {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-link,
+    .nav-footer-link {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 44px;
+      padding: 12px 16px;
+      border: 0;
+      background: transparent;
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-align: left;
+      text-transform: uppercase;
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+    }
+
+    .nav-link::before,
+    .nav-footer-link::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border: 1px solid currentColor;
+      opacity: 0.78;
+    }
+
+    .nav-link:hover,
+    .nav-footer-link:hover,
+    .nav-link:focus-visible,
+    .nav-footer-link:focus-visible {
+      transform: translateX(2px);
+      color: var(--primary);
+      outline: none;
+    }
+
+    .nav-link.is-active {
+      margin: 0 4px;
+      background: var(--surface-container-lowest);
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .workspace {
+      min-width: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 20px 40px;
+      backdrop-filter: blur(20px);
+      background:
+        linear-gradient(180deg, rgba(237, 245, 242, 1) 0%, rgba(237, 245, 242, 0) 100%),
+        linear-gradient(90deg, rgba(243, 251, 248, 0.8) 0%, rgba(243, 251, 248, 0.8) 100%);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      min-width: 0;
+    }
+
+    .brandmark {
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      min-width: 0;
+    }
+
+    .topnav-link {
+      color: var(--on-surface-soft);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 20px;
+      font-style: italic;
+      line-height: 28px;
+      transition: color var(--transition), border-color var(--transition);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+    }
+
+    .topnav-link:hover,
+    .topnav-link:focus-visible,
+    .topnav-link.is-active {
+      color: var(--primary);
+      border-color: currentColor;
+      outline: none;
+    }
+
+    .primary-cta {
+      padding: 8px 24px;
+      border: 0;
+      background: var(--primary);
+      color: #ffffff;
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: transform var(--transition), background var(--transition);
+    }
+
+    .primary-cta:hover,
+    .primary-cta:focus-visible,
+    .configure-button:hover,
+    .configure-button:focus-visible,
+    .candidate-select:hover,
+    .candidate-select:focus-visible,
+    .evidence-link:hover,
+    .evidence-link:focus-visible {
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .primary-cta.is-copied {
+      background: var(--primary-container);
+    }
+
+    .canvas {
+      padding: 0 40px 56px;
+    }
+
+    .hero-section {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 32px;
+      min-height: 294px;
+      padding: 10px 0 32px;
+      align-items: end;
+    }
+
+    .hero-copy {
+      grid-column: span 8;
+      display: grid;
+      gap: 16px;
+      max-width: 760px;
+    }
+
+    .hero-title {
+      margin: 0;
+      color: var(--primary);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: clamp(56px, 6vw, 72px);
+      font-style: italic;
+      font-weight: 400;
+      line-height: 0.98;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-lede,
+    .hero-meta,
+    .candidate-description,
+    .mental-model-copy,
+    .framework-copy,
+    .empty-state,
+    .config-note {
+      color: var(--on-surface-muted);
+      font-size: 20px;
+      line-height: 1.6;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .phase-badge {
+      grid-column: 9 / span 4;
+      justify-self: end;
+      align-self: end;
+      padding: 4px 16px;
+      background: var(--accent-lime);
+      color: var(--ink-dark);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: var(--surface-container-lowest);
+      color: var(--secondary);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid var(--ghost-line);
+      white-space: nowrap;
+    }
+
+    .pill.primary {
+      color: var(--primary);
+      background: var(--surface-container-lowest);
+    }
+
+    .pill.secondary {
+      background: var(--secondary-container);
+      color: var(--secondary);
+    }
+
+    .pill.lime {
+      background: rgba(195, 244, 0, 0.18);
+      color: var(--ink-dark);
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0;
+      border: 1px solid var(--ghost-line-strong);
+      background: var(--surface-container-lowest);
+    }
+
+    .metric-card {
+      padding: 32px;
+      min-height: 148px;
+      background: var(--surface-container-lowest);
+      border-right: 1px solid var(--ghost-line-strong);
+    }
+
+    .metric-card:last-child {
+      border-right: 0;
+    }
+
+    .metric-card-label,
+    .mini-kicker,
+    .section-label,
+    .config-label {
+      margin: 0;
+      color: var(--on-surface-soft);
+      font-size: 10px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .metric-card-value {
+      margin: 8px 0 0;
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: clamp(34px, 4vw, 36px);
+      font-weight: 300;
+      line-height: 1.05;
+    }
+
+    .metric-bar {
+      width: 48px;
+      height: 4px;
+      margin-top: 16px;
+    }
+
+    .metric-bar.primary {
+      background: var(--primary);
+    }
+
+    .metric-bar.secondary {
+      background: var(--secondary);
+    }
+
+    .metric-bar.lime {
+      background: var(--accent-lime);
+    }
+
+    .metric-bar.deep {
+      background: var(--primary-container);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.85fr);
+      gap: 32px;
+      margin-top: 32px;
+      align-items: start;
+    }
+
+    .main-column {
+      display: grid;
+      gap: 32px;
+      min-width: 0;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--ghost-line);
+      padding-bottom: 17px;
+    }
+
+    .section-display,
+    .audit-heading,
+    .mental-model-subhead,
+    .framework-title {
+      margin: 0;
+      color: var(--primary);
+      font-family: "Newsreader", Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .section-display,
+    .audit-heading {
+      font-size: 30px;
+      line-height: 36px;
+    }
+
+    .vector-legend,
+    .results-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--on-surface);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .legend-swatch {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+    }
+
+    .vector-section {
+      display: grid;
+      gap: 24px;
+    }
+
+    .vector-panel {
+      position: relative;
+      min-height: 384px;
+      padding: 0;
+      background: linear-gradient(180deg, rgba(232, 240, 237, 0.92) 0%, rgba(232, 240, 237, 0.98) 100%);
+      overflow: hidden;
+    }
+
+    .vector-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.34) 0, rgba(255, 255, 255, 0.34) 1px, transparent 1px, transparent 25%),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.34) 0, rgba(255, 255, 255, 0.34) 1px, transparent 1px, transparent 50%),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.34) 0, rgba(255, 255, 255, 0.34) 1px, transparent 1px, transparent 75%);
+      opacity: 0.22;
+      pointer-events: none;
+    }
+
+    .vector-tag {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 1;
+      padding: 9px;
+      background: rgba(255, 255, 255, 0.84);
+      border: 1px solid var(--ghost-line);
+      color: var(--on-surface-soft);
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .vector-chart {
+      display: block;
+      width: 100%;
+      height: 384px;
+    }
+
+    .filter-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px;
+      background: var(--surface-container-low);
+    }
+
+    .filter-strip-main {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .filter-strip-label {
+      padding-left: 16px;
+      min-width: 0;
+    }
+
+    .filter-pill-track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .filter-pill {
+      padding: 6px 18px;
+      border: 1px solid rgba(111, 121, 120, 0.3);
+      background: transparent;
+      color: var(--on-surface);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 12px;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .configure-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .configure-button::before {
+      content: "";
+      width: 11px;
+      height: 11px;
+      border: 1px solid currentColor;
+      background:
+        linear-gradient(currentColor, currentColor) center / 7px 1px no-repeat,
+        linear-gradient(currentColor, currentColor) center / 1px 7px no-repeat;
+      opacity: 0.85;
+    }
+
+    .configuration-panel {
+      display: grid;
+      gap: 18px;
+      padding: 24px;
+      background: var(--surface-container-lowest);
+      box-shadow: var(--shadow);
+    }
+
+    .configuration-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .config-field {
+      display: grid;
+      gap: 10px;
+    }
+
+    .config-input,
+    .config-select {
+      min-height: 44px;
+      padding: 11px 0;
+      border: 0;
+      border-bottom: 1px solid var(--outline);
+      background: transparent;
+      color: var(--on-surface);
+    }
+
+    .config-input::placeholder {
+      color: rgba(79, 99, 92, 0.78);
+    }
+
+    .config-input:focus-visible,
+    .config-select:focus-visible,
+    .primary-cta:focus-visible {
+      outline: none;
+      border-bottom-color: var(--primary);
+      box-shadow: inset 0 -2px 0 var(--primary);
+    }
+
+    .config-note {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .candidate-section {
+      display: grid;
+      gap: 32px;
+    }
+
+    .candidate-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+    }
+
+    .candidate-card {
+      display: grid;
+      align-content: start;
+      gap: 22px;
+      min-height: 518px;
+      padding: 32px;
+      background: var(--surface-container-lowest);
+      border: 1px solid rgba(191, 200, 200, 0.1);
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition), background var(--transition);
+      animation: rise-in 360ms var(--transition) both;
+    }
+
+    .candidate-card.is-active {
+      background: #ffffff;
+      border-color: rgba(191, 200, 200, 0.24);
+      box-shadow: var(--shadow);
+    }
+
+    .candidate-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .candidate-header {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .candidate-header-left {
+      display: grid;
+      gap: 4px;
+    }
+
+    .candidate-meta-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 29px;
+      min-height: 19px;
+      padding: 2px 8px;
+      background: var(--primary);
+      color: #ffffff;
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 15px;
+    }
+
+    .candidate-card[data-rank="2"] .rank-badge {
+      background: var(--secondary);
+    }
+
+    .candidate-code {
+      color: var(--secondary);
+      font-size: 10px;
+      line-height: 15px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .candidate-title {
+      margin: 0;
+      color: var(--primary);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 24px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.15;
+    }
+
+    .candidate-score {
+      display: grid;
+      justify-items: end;
+      gap: 2px;
+      text-align: right;
+    }
+
+    .candidate-score-label {
+      color: var(--on-surface-soft);
+      font-size: 10px;
+      line-height: 15px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .candidate-score-value {
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+    }
+
+    .candidate-card[data-rank="1"] .candidate-score-value,
+    .candidate-card.is-active .candidate-score-value {
+      color: var(--accent-lime-deep);
+    }
+
+    .candidate-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .candidate-stat {
+      padding: 12px;
+      background: var(--surface-container);
+    }
+
+    .candidate-stat-label {
+      margin: 0;
+      color: var(--secondary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .candidate-stat-value {
+      margin: 2px 0 0;
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 24px;
+    }
+
+    .candidate-description {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .candidate-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(191, 200, 200, 0.1);
+      margin-top: auto;
+    }
+
+    .sparkline {
+      width: 128px;
+      height: 32px;
+      opacity: 0.72;
+    }
+
+    .candidate-select {
+      border: 0;
+      border-bottom: 2px solid var(--primary);
+      padding: 0 0 2px;
+      background: transparent;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .empty-state {
+      padding: 32px;
+      background: var(--surface-container-lowest);
+      box-shadow: var(--shadow);
+      font-size: 16px;
+    }
+
+    .audit-panel {
+      position: sticky;
+      top: 104px;
+      display: grid;
+      gap: 32px;
+      align-content: start;
+      min-width: 0;
+    }
+
+    .audit-section {
+      display: grid;
+      gap: 16px;
+    }
+
+    .command-card {
+      display: grid;
+      gap: 15px;
+      padding: 24px;
+      background: var(--on-surface);
+      color: #e2eae7;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .command-label {
+      margin: 0;
+      color: #bfc8c8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .command-shell {
+      margin: 0;
+      color: #e2eae7;
+      font-size: 12px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .command-links,
+    .evidence-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .evidence-link {
+      border-bottom: 2px solid currentColor;
+      padding-bottom: 2px;
+      color: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .mental-model-card {
+      display: grid;
+      gap: 16px;
+      padding: 32px 32px 32px 36px;
+      background: var(--surface-container-low);
+      border-left: 4px solid var(--primary);
+    }
+
+    .mental-model-subhead {
+      font-size: 20px;
+      line-height: 28px;
+    }
+
+    .mental-model-copy,
+    .framework-copy,
+    .telemetry-value,
+    .window-value {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .telemetry-stack,
+    .window-stack,
+    .evidence-stack,
+    .framework-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .telemetry-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(191, 200, 200, 0.1);
+    }
+
+    .telemetry-key {
+      color: var(--secondary);
+      font-size: 11px;
+      line-height: 16.5px;
+      text-transform: uppercase;
+    }
+
+    .telemetry-value {
+      color: var(--primary);
+      font-family: "Space Grotesk", "Inter", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .telemetry-value.high {
+      color: var(--accent-lime-deep);
+    }
+
+    .telemetry-value.moderate {
+      color: #8e7a33;
+    }
+
+    .telemetry-value.watch {
+      color: #7c5656;
+    }
+
+    .window-card,
+    .evidence-card,
+    .framework-card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      background: var(--surface-container-lowest);
+      box-shadow: var(--shadow);
+    }
+
+    .window-period {
+      color: var(--secondary);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .window-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .window-metric {
+      display: grid;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--surface-container-low);
+    }
+
+    .window-value.positive {
+      color: #375c00;
+    }
+
+    .window-value.negative {
+      color: #7c3b3b;
+    }
+
+    .framework-title {
+      font-size: 20px;
+      line-height: 28px;
+    }
+
+    .framework-copy {
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .surface-divider {
+      height: 1px;
+      background: var(--ghost-line);
+      opacity: 0.7;
+    }
+
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1260px) {
+      .page-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidenav {
+        position: relative;
+        height: auto;
+        padding: 32px 20px 20px;
+        gap: 20px;
+      }
+
+      .sidenav-nav,
+      .sidenav-footer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .topbar,
+      .canvas {
+        padding-inline: 20px;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .audit-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .topbar,
+      .topbar-left,
+      .hero-section,
+      .section-heading,
+      .filter-strip {
+        display: grid;
+      }
+
+      .topbar,
+      .topbar-left {
+        gap: 16px;
+      }
+
+      .topbar-left,
+      .hero-copy,
+      .phase-badge {
+        grid-column: 1 / -1;
+      }
+
+      .hero-section {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .phase-badge {
+        justify-self: start;
+      }
+
+      .metrics-row,
+      .configuration-grid,
+      .candidate-grid,
+      .window-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .section-heading,
+      .filter-strip {
+        gap: 14px;
+      }
+
+      .vector-legend,
+      .results-meta {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topnav,
+      .filter-strip-main,
+      .sidenav-nav,
+      .sidenav-footer,
+      .metrics-row,
+      .configuration-grid,
+      .candidate-grid,
+      .window-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topnav,
+      .filter-pill-track {
+        flex-wrap: wrap;
+      }
+
+      .topbar {
+        padding-top: 16px;
+      }
+
+      .hero-title {
+        font-size: 48px;
+      }
+
+      .hero-lede {
+        font-size: 18px;
+      }
+
+      .metric-card,
+      .candidate-card,
+      .mental-model-card,
+      .command-card,
+      .configuration-panel {
+        padding: 20px;
+      }
+
+      .candidate-footer {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .section-display,
+      .audit-heading {
+        font-size: 28px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <aside class="sidenav" aria-label="Curator navigation">
+      <div>
+        <div class="sidenav-brand">
+          <h1 class="sidenav-title">The Curator</h1>
+          <p class="sidenav-tag">PhD-Level Intelligence</p>
+        </div>
+
+        <nav class="sidenav-nav">
+          <a class="nav-link is-active" href="#hero">Strategy Frontier</a>
+          <button class="nav-link" id="nav-windows" type="button">Audited Ledgers</button>
+          <button class="nav-link" id="nav-config" type="button">Data Warehouse</button>
+          <a class="nav-link" href="#candidate-briefing">Strategy Registry</a>
+        </nav>
+      </div>
+
+      <div class="sidenav-footer">
+        <button class="nav-footer-link" id="footer-settings" type="button">Settings</button>
+        <a class="nav-footer-link" href="#evidence-links">Documentation</a>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="brandmark">ZONK</div>
+          <nav class="topnav" aria-label="Top navigation">
+            <a class="topnav-link" href="#hero">Research Hub</a>
+            <a class="topnav-link is-active" href="#candidate-briefing">Strategy Frontier</a>
+          </nav>
+        </div>
+        <button class="primary-cta" id="copy-command-button" type="button">Run Autoresearch</button>
+      </header>
+
+      <main class="canvas">
+        <section class="hero-section" id="hero">
+          <div class="hero-copy">
+            <h1 class="hero-title">The Strategy Frontier</h1>
+            <p class="hero-lede">
+              An autonomous laboratory for candidate-discovery and large-scale web-driven exploration.
+              Utilizing high-fidelity market data to simulate and rank quantitative paradigms.
+            </p>
+            <div class="hero-meta" id="hero-meta"></div>
+          </div>
+          <div class="phase-badge" id="phase-badge">Phase: Autonomous Discovery</div>
+        </section>
+
+        <section class="metrics-row" id="metrics-row" aria-label="Frontier metrics"></section>
+
+        <div class="content-grid">
+          <div class="main-column">
+            <section class="vector-section" aria-labelledby="alpha-vector-title">
+              <div class="section-heading">
+                <h2 class="section-display" id="alpha-vector-title">Primary Alpha Vector</h2>
+                <div class="vector-legend" id="vector-legend"></div>
+              </div>
+
+              <div class="vector-panel">
+                <div class="vector-tag" id="vector-tag">Normalized return profile</div>
+                <svg class="vector-chart" viewBox="0 0 760 384" preserveAspectRatio="none" aria-labelledby="alpha-vector-title">
+                  <defs>
+                    <linearGradient id="selected-stroke" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#003434" />
+                      <stop offset="100%" stop-color="#004d4d" />
+                    </linearGradient>
+                    <linearGradient id="selected-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="rgba(0, 52, 52, 0.12)" />
+                      <stop offset="100%" stop-color="rgba(0, 52, 52, 0)" />
+                    </linearGradient>
+                  </defs>
+                  <path id="selected-area" fill="url(#selected-fill)" opacity="1"></path>
+                  <path id="baseline-path" fill="none" stroke="#6f7978" stroke-opacity="0.72" stroke-width="2" stroke-dasharray="3 5"></path>
+                  <path id="selected-path" fill="none" stroke="url(#selected-stroke)" stroke-width="3"></path>
+                  <circle id="selected-focus" r="14" fill="rgba(191, 200, 200, 0.4)"></circle>
+                </svg>
+              </div>
+            </section>
+
+            <section class="filter-strip" aria-labelledby="filter-strip-title">
+              <div class="filter-strip-main">
+                <div class="filter-strip-label">
+                  <p class="mini-kicker" id="filter-strip-title">Active Filters</p>
+                </div>
+                <div class="filter-pill-track" id="active-filter-chips"></div>
+              </div>
+              <button class="configure-button" id="toggle-config" type="button" aria-expanded="false" aria-controls="configuration-panel">Configure Grid</button>
+            </section>
+
+            <section class="configuration-panel" id="configuration-panel" hidden>
+              <div class="configuration-grid">
+                <div class="config-field">
+                  <label class="config-label" for="search">Search</label>
+                  <input class="config-input" id="search" type="search" placeholder="Candidate id, rule, asset, source, rationale" />
+                </div>
+                <div class="config-field">
+                  <label class="config-label" for="asset-filter">Asset</label>
+                  <select class="config-select" id="asset-filter"></select>
+                </div>
+                <div class="config-field">
+                  <label class="config-label" for="rule-filter">Rule</label>
+                  <select class="config-select" id="rule-filter"></select>
+                </div>
+                <div class="config-field">
+                  <label class="config-label" for="seed-filter">Origin</label>
+                  <select class="config-select" id="seed-filter">
+                    <option value="all">All Candidates</option>
+                    <option value="seeded">Seeded Leads</option>
+                    <option value="derived">Derived Variants</option>
+                  </select>
+                </div>
+                <div class="config-field">
+                  <label class="config-label" for="sort-by">Sort</label>
+                  <select class="config-select" id="sort-by">
+                    <option value="combined">Combined Score</option>
+                    <option value="testSharpe">Test Sharpe</option>
+                    <option value="testCagr">Test CAGR</option>
+                    <option value="endingEquity">Test Ending Equity</option>
+                    <option value="trades">Audited Trades</option>
+                    <option value="lowestDrawdown">Lowest Test Drawdown</option>
+                  </select>
+                </div>
+              </div>
+              <p class="config-note">
+                The grid stays editorial by default. Open configuration only when you need to reshape the frontier,
+                then return to the briefing view once the field is narrowed.
+              </p>
+            </section>
+
+            <section class="candidate-section" id="candidate-briefing" aria-labelledby="candidate-briefing-title">
+              <div class="section-heading">
+                <h2 class="section-display" id="candidate-briefing-title">Candidate Briefing</h2>
+                <div class="results-meta" id="results-meta"></div>
+              </div>
+              <div class="candidate-grid" id="results-grid"></div>
+              <div class="empty-state" id="results-empty" hidden>No candidates match the current filters. Adjust the grid configuration to restore the frontier.</div>
+            </section>
+          </div>
+
+          <aside class="audit-panel" id="audit-rail" aria-live="polite"></aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const REPORT_META = /* PASTE_META_HERE */;
+    const REPORT_ROWS = /* PASTE_ROWS_HERE */;
+
+    const state = {
+      query: "",
+      asset: "all",
+      rule: "all",
+      origin: "all",
+      sort: "combined",
+      selectedId: REPORT_ROWS[0]?.candidate_id ?? null,
+      configOpen: false,
+    };
+
+    const els = {
+      heroMeta: document.getElementById("hero-meta"),
+      phaseBadge: document.getElementById("phase-badge"),
+      metricsRow: document.getElementById("metrics-row"),
+      vectorLegend: document.getElementById("vector-legend"),
+      vectorTag: document.getElementById("vector-tag"),
+      selectedArea: document.getElementById("selected-area"),
+      selectedPath: document.getElementById("selected-path"),
+      baselinePath: document.getElementById("baseline-path"),
+      selectedFocus: document.getElementById("selected-focus"),
+      activeFilterChips: document.getElementById("active-filter-chips"),
+      toggleConfig: document.getElementById("toggle-config"),
+      configurationPanel: document.getElementById("configuration-panel"),
+      search: document.getElementById("search"),
+      assetFilter: document.getElementById("asset-filter"),
+      ruleFilter: document.getElementById("rule-filter"),
+      seedFilter: document.getElementById("seed-filter"),
+      sortBy: document.getElementById("sort-by"),
+      resultsMeta: document.getElementById("results-meta"),
+      resultsGrid: document.getElementById("results-grid"),
+      resultsEmpty: document.getElementById("results-empty"),
+      auditRail: document.getElementById("audit-rail"),
+      copyCommandButton: document.getElementById("copy-command-button"),
+      navWindows: document.getElementById("nav-windows"),
+      navConfig: document.getElementById("nav-config"),
+      footerSettings: document.getElementById("footer-settings"),
+    };
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function safeHref(value) {
+      const href = String(value ?? "").trim();
+      if (!href) return "#";
+      if (
+        href.startsWith("http://") ||
+        href.startsWith("https://") ||
+        href.startsWith("autoresearch-audits/")
+      ) {
+        return encodeURI(href);
+      }
+      return "#";
+    }
+
+    function number(value) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function detail(row, key, stage = "test") {
+      const bucket = stage === "train" ? row.train_details : row.test_details;
+      return number(bucket?.[key]);
+    }
+
+    function totalTrades(row) {
+      return number(row.train_audit?.trade_count) + number(row.test_audit?.trade_count);
+    }
+
+    function pct(value, fractionDigits = 1) {
+      return `${(number(value) * 100).toFixed(fractionDigits)}%`;
+    }
+
+    function signedPct(value, fractionDigits = 1) {
+      const amount = number(value) * 100;
+      const sign = amount > 0 ? "+" : "";
+      return `${sign}${amount.toFixed(fractionDigits)}%`;
+    }
+
+    function fmt(value, fractionDigits = 2) {
+      return number(value).toFixed(fractionDigits);
+    }
+
+    function currency(value, fractionDigits = 0) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: fractionDigits,
+        minimumFractionDigits: fractionDigits,
+      }).format(number(value));
+    }
+
+    function formatDateTime(value) {
+      const date = value ? new Date(value) : null;
+      if (!date || Number.isNaN(date.getTime())) return "Unknown";
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      }).format(date);
+    }
+
+    function formatTime(value) {
+      const date = value ? new Date(value) : null;
+      if (!date || Number.isNaN(date.getTime())) return "Unknown";
+      return new Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZoneName: "short",
+      }).format(date);
+    }
+
+    function domainLabel(url) {
+      try {
+        return new URL(url).hostname.replace(/^www\./, "");
+      } catch {
+        return "local";
+      }
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function compactText(value, maxLength = 180) {
+      const text = String(value ?? "").replace(/\s+/g, " ").trim();
+      if (text.length <= maxLength) return text;
+      return `${text.slice(0, maxLength - 1).trimEnd()}…`;
+    }
+
+    function metricToneClass(value, positiveClass, negativeClass) {
+      return number(value) >= 0 ? positiveClass : negativeClass;
+    }
+
+    function originLabel(row) {
+      return row.is_seeded ? "Seeded Lead" : "Derived Variant";
+    }
+
+    function humanizeRule(rule) {
+      const raw = String(rule ?? "").replaceAll("_", " ").replaceAll("-", " ").trim();
+      if (!raw) return "Adaptive Rule";
+      return raw.replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+    function hypothesisHeadline(row) {
+      switch (row?.rule) {
+        case "vol_spread":
+          return "The Variance Premium Thesis";
+        case "volatility_regime":
+          return "The Regime Filter Thesis";
+        case "rsi_reversion":
+          return "The Mean Reversion Thesis";
+        case "trend_momentum":
+          return "The Trend Persistence Thesis";
+        case "trend_pullback":
+          return "The Pullback Re-entry Thesis";
+        default:
+          return "The Strategy Thesis";
+      }
+    }
+
+    function confidenceLabel(row) {
+      const sharpe = detail(row, "sharpe", "test");
+      const drawdown = Math.abs(detail(row, "max_drawdown", "test"));
+      if (sharpe >= 1.0 && drawdown <= 0.12) {
+        return { label: "HIGH", tone: "high" };
+      }
+      if (sharpe >= 0.55 && drawdown <= 0.2) {
+        return { label: "MODERATE", tone: "moderate" };
+      }
+      return { label: "WATCH", tone: "watch" };
+    }
+
+    function actualCommand(row) {
+      return ["zonk", row.strategy, ...row.args, "--output", "json"].join(" ");
+    }
+
+    function equityRatio(details) {
+      const start = number(details?.beginning_equity);
+      const end = number(details?.final_equity);
+      if (start <= 0 || end <= 0) return 1;
+      return end / start;
+    }
+
+    function buildProfileSeries(row) {
+      const trainRatio = clamp(equityRatio(row.train_details), 0.72, 3.5);
+      const testRatio = clamp(equityRatio(row.test_details), 0.72, 3.0);
+      const trainDrawdown = clamp(Math.abs(detail(row, "max_drawdown", "train")), 0, 0.35);
+      const testDrawdown = clamp(Math.abs(detail(row, "max_drawdown", "test")), 0, 0.35);
+      return [
+        1.0,
+        1.0 + (trainRatio - 1) * 0.22,
+        1.0 + (trainRatio - 1) * 0.58 - trainDrawdown * 0.18,
+        trainRatio - trainDrawdown * 0.08,
+        trainRatio * (1 + (testRatio - 1) * 0.38) - testDrawdown * 0.12,
+        trainRatio * (1 + (testRatio - 1) * 0.74) - testDrawdown * 0.04,
+        trainRatio * testRatio,
+      ].map((value) => clamp(value, 0.58, 4.2));
+    }
+
+    function averageProfileSeries(rows) {
+      if (!rows.length) return [1, 1, 1, 1, 1, 1, 1];
+      const profiles = rows.map(buildProfileSeries);
+      return profiles[0].map((_, index) => (
+        profiles.reduce((sum, profile) => sum + number(profile[index]), 0) / profiles.length
+      ));
+    }
+
+    function buildPoints(series, width, height, padding, minValue, maxValue) {
+      const span = Math.max(maxValue - minValue, 0.001);
+      const usableWidth = width - padding * 2;
+      const usableHeight = height - padding * 2;
+      return series.map((value, index) => {
+        const x = padding + (usableWidth * index) / Math.max(series.length - 1, 1);
+        const normalized = (value - minValue) / span;
+        const y = height - padding - normalized * usableHeight;
+        return [Number(x.toFixed(2)), Number(y.toFixed(2))];
+      });
+    }
+
+    function linePath(points) {
+      return points.map(([x, y], index) => `${index === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+    }
+
+    function areaPath(points, height, padding) {
+      if (!points.length) return "";
+      const first = points[0];
+      const last = points[points.length - 1];
+      return `${linePath(points)} L ${last[0]} ${height - padding} L ${first[0]} ${height - padding} Z`;
+    }
+
+    function sparklineSvg(row) {
+      const series = buildProfileSeries(row);
+      const minValue = Math.min(...series) - 0.08;
+      const maxValue = Math.max(...series) + 0.08;
+      const points = buildPoints(series, 128, 32, 2, minValue, maxValue);
+      const path = linePath(points);
+      return `
+        <svg class="sparkline" viewBox="0 0 128 32" preserveAspectRatio="none" aria-hidden="true">
+          <path d="${path}" fill="none" stroke="${escapeHtml(row.rank === 1 || row.candidate_id === state.selectedId ? "#003434" : "#9aa6a3")}" stroke-width="2"></path>
+        </svg>
+      `;
+    }
+
+    function filteredRows() {
+      const query = state.query.trim().toLowerCase();
+      return REPORT_ROWS.filter((row) => {
+        if (state.asset !== "all" && row.focus_asset !== state.asset) return false;
+        if (state.rule !== "all" && row.rule !== state.rule) return false;
+        if (state.origin === "seeded" && !row.is_seeded) return false;
+        if (state.origin === "derived" && row.is_seeded) return false;
+        if (!query) return true;
+        const haystack = [
+          row.candidate_id,
+          row.rule,
+          row.focus_asset,
+          row.source,
+          row.rationale,
+          row.why,
+          row.strategy_description,
+          row.critical_evaluation,
+          row.investment_rationale,
+          row.backtest_architecture,
+          row.args.join(" "),
+        ].join(" ").toLowerCase();
+        return haystack.includes(query);
+      }).sort((a, b) => {
+        const primary = sortAccessor(b, state.sort) - sortAccessor(a, state.sort);
+        if (Math.abs(primary) > 1e-9) return primary;
+        return number(b.combined_score) - number(a.combined_score);
+      });
+    }
+
+    function sortAccessor(row, mode) {
+      switch (mode) {
+        case "testSharpe":
+          return detail(row, "sharpe", "test");
+        case "testCagr":
+          return detail(row, "cagr", "test");
+        case "endingEquity":
+          return detail(row, "final_equity", "test");
+        case "trades":
+          return totalTrades(row);
+        case "lowestDrawdown":
+          return -Math.abs(detail(row, "max_drawdown", "test"));
+        case "combined":
+        default:
+          return number(row.combined_score);
+      }
+    }
+
+    function selectedRow(rows) {
+      if (!rows.length) return null;
+      const selected = rows.find((row) => row.candidate_id === state.selectedId);
+      if (selected) return selected;
+      state.selectedId = rows[0].candidate_id;
+      return rows[0];
+    }
+
+    function selectedPosition(rows, row) {
+      const index = rows.findIndex((candidate) => candidate.candidate_id === row.candidate_id);
+      return index >= 0 ? index + 1 : 1;
+    }
+
+    function heroContextRows(rows) {
+      return rows.length ? rows : REPORT_ROWS;
+    }
+
+    function renderHero(rows, selected) {
+      const contextRows = heroContextRows(rows);
+      const leader = selected || contextRows[0] || null;
+      const representedAssets = new Set(contextRows.map((row) => row.focus_asset)).size;
+      const heroChips = [
+        `Generated ${formatDateTime(REPORT_META.generated_date)}`,
+        `${REPORT_META.framework_tag}`,
+        `Train ${REPORT_META.train_start} to ${REPORT_META.train_end}`,
+        `Test ${REPORT_META.test_start} to ${REPORT_META.test_end}`,
+        `${representedAssets} assets represented`,
+      ];
+      if (leader) {
+        heroChips.unshift(`Lead ${leader.candidate_id}`);
+      }
+      els.heroMeta.innerHTML = heroChips
+        .map((item, index) => `<span class="pill ${index === 0 ? "primary" : ""}">${escapeHtml(item)}</span>`)
+        .join("");
+
+      if (state.origin === "seeded") {
+        els.phaseBadge.textContent = "Phase: Seeded Discovery";
+      } else if (state.origin === "derived") {
+        els.phaseBadge.textContent = "Phase: Derived Validation";
+      } else {
+        els.phaseBadge.textContent = "Phase: Autonomous Discovery";
+      }
+    }
+
+    function metricCardHtml(label, value, tone) {
+      return `
+        <article class="metric-card">
+          <p class="metric-card-label">${escapeHtml(label)}</p>
+          <div class="metric-card-value">${escapeHtml(value)}</div>
+          <div class="metric-bar ${escapeHtml(tone)}"></div>
+        </article>
+      `;
+    }
+
+    function renderMetrics(rows, selected) {
+      const contextRows = heroContextRows(rows);
+      const audited = contextRows.filter((row) => row.train_audit || row.test_audit).length;
+      const leader = selected || contextRows[0] || null;
+      const metrics = [
+        metricCardHtml("Ranked Candidates", String(REPORT_META.total_ranked), "primary"),
+        metricCardHtml("Refinement Rounds", String(REPORT_META.round_count), "secondary"),
+        metricCardHtml("Audited Trails", `${audited}/${contextRows.length}`, "lime"),
+        metricCardHtml("Lead Test Sharpe", leader ? fmt(detail(leader, "sharpe", "test"), 2) : "0.00", "deep"),
+      ];
+      els.metricsRow.innerHTML = metrics.join("");
+    }
+
+    function renderVector(rows, selected) {
+      if (!selected) {
+        els.vectorLegend.innerHTML = "";
+        els.vectorTag.textContent = "Normalized return profile";
+        els.selectedPath.setAttribute("d", "");
+        els.selectedArea.setAttribute("d", "");
+        els.baselinePath.setAttribute("d", "");
+        els.selectedFocus.setAttribute("cx", "0");
+        els.selectedFocus.setAttribute("cy", "0");
+        return;
+      }
+
+      const selectedSeries = buildProfileSeries(selected);
+      const baselineSeries = averageProfileSeries(heroContextRows(rows));
+      const allValues = [...selectedSeries, ...baselineSeries];
+      const minValue = Math.min(...allValues) - 0.12;
+      const maxValue = Math.max(...allValues) + 0.12;
+      const selectedPoints = buildPoints(selectedSeries, 760, 384, 18, minValue, maxValue);
+      const baselinePoints = buildPoints(baselineSeries, 760, 384, 18, minValue, maxValue);
+      const focusPoint = selectedPoints[Math.min(3, selectedPoints.length - 1)] || [0, 0];
+      els.selectedPath.setAttribute("d", linePath(selectedPoints));
+      els.selectedArea.setAttribute("d", areaPath(selectedPoints, 384, 18));
+      els.baselinePath.setAttribute("d", linePath(baselinePoints));
+      els.selectedFocus.setAttribute("cx", String(focusPoint[0]));
+      els.selectedFocus.setAttribute("cy", String(focusPoint[1]));
+
+      els.vectorLegend.innerHTML = `
+        <span class="legend-item"><span class="legend-swatch" style="background:#003434;"></span>${escapeHtml(selected.candidate_id)}</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#6f7978;"></span>Frontier Median</span>
+      `;
+
+      els.vectorTag.textContent = `Out-of-sample ending equity ${currency(detail(selected, "final_equity", "test"))} · CAGR ${signedPct(detail(selected, "cagr", "test"))}`;
+    }
+
+    function renderFilterStrip(rows, selected) {
+      const filters = [
+        `Asset: ${state.asset === "all" ? "All" : state.asset}`,
+        `Rule: ${state.rule === "all" ? "All" : humanizeRule(state.rule)}`,
+        `Origin: ${state.origin === "all" ? "All" : state.origin === "seeded" ? "Seeded" : "Derived"}`,
+      ];
+      if (state.query) {
+        filters.push(`Query: ${compactText(state.query, 24)}`);
+      }
+      if (selected) {
+        filters.push(`Lead: #${selectedPosition(rows, selected)}`);
+      }
+
+      els.activeFilterChips.innerHTML = filters
+        .map((item) => `<span class="filter-pill">${escapeHtml(item)}</span>`)
+        .join("");
+
+      els.configurationPanel.hidden = !state.configOpen;
+      els.toggleConfig.setAttribute("aria-expanded", String(state.configOpen));
+      els.toggleConfig.textContent = state.configOpen ? "Hide Grid" : "Configure Grid";
+    }
+
+    function renderResultsMeta(rows, selected) {
+      const sortLabel = {
+        combined: "Combined Score",
+        testSharpe: "Test Sharpe",
+        testCagr: "Test CAGR",
+        endingEquity: "Ending Equity",
+        trades: "Audited Trades",
+        lowestDrawdown: "Lowest Drawdown",
+      }[state.sort] || "Combined Score";
+
+      const items = [
+        `${rows.length} visible`,
+        `Sorted by ${sortLabel}`,
+      ];
+      if (selected) {
+        items.push(`Selected #${selectedPosition(rows, selected)}`);
+      }
+
+      els.resultsMeta.innerHTML = items
+        .map((item, index) => `<span class="pill ${index === 0 ? "secondary" : ""}">${escapeHtml(item)}</span>`)
+        .join("");
+    }
+
+    function candidateCardHtml(row, selected) {
+      const isActive = selected && selected.candidate_id === row.candidate_id;
+      const scoreLabel = row.rank === 1 ? "Lead Score" : "Combined Score";
+      return `
+        <article class="candidate-card ${isActive ? "is-active" : ""}" data-rank="${escapeHtml(String(row.rank))}">
+          <div class="candidate-header">
+            <div class="candidate-header-left">
+              <div class="candidate-meta-line">
+                <span class="rank-badge">#${escapeHtml(String(row.rank))}</span>
+                <span class="candidate-code">${escapeHtml(row.candidate_id)}</span>
+              </div>
+              <h3 class="candidate-title">${escapeHtml(row.rule)}</h3>
+            </div>
+            <div class="candidate-score">
+              <span class="candidate-score-label">${escapeHtml(scoreLabel)}</span>
+              <span class="candidate-score-value">${escapeHtml(fmt(row.combined_score, 2))}</span>
+            </div>
+          </div>
+
+          <div class="candidate-stat-grid">
+            <div class="candidate-stat">
+              <p class="candidate-stat-label">Primary Asset</p>
+              <p class="candidate-stat-value">${escapeHtml(row.focus_asset)}</p>
+            </div>
+            <div class="candidate-stat">
+              <p class="candidate-stat-label">Origin</p>
+              <p class="candidate-stat-value">${escapeHtml(originLabel(row))}</p>
+            </div>
+          </div>
+
+          <p class="candidate-description">${escapeHtml(compactText(row.why, 210))}</p>
+
+          <div class="candidate-footer">
+            ${sparklineSvg(row)}
+            <button class="candidate-select" type="button" data-candidate-id="${escapeHtml(row.candidate_id)}">Inspect</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderResults(rows) {
+      if (!rows.length) {
+        els.resultsGrid.innerHTML = "";
+        els.resultsEmpty.hidden = false;
+        return;
+      }
+
+      els.resultsEmpty.hidden = true;
+      const selected = selectedRow(rows);
+      els.resultsGrid.innerHTML = rows
+        .map((row) => candidateCardHtml(row, selected))
+        .join("");
+    }
+
+    function windowCard(label, details, audit, requestedStart, requestedEnd) {
+      const startEquity = number(details?.beginning_equity);
+      const finalEquity = number(details?.final_equity);
+      const equityDelta = finalEquity - startEquity;
+      return `
+        <article class="window-card">
+          <p class="section-label">${escapeHtml(label)}</p>
+          <div class="window-period">Requested ${escapeHtml(requestedStart)} to ${escapeHtml(requestedEnd)}</div>
+          <div class="window-period">Actual ${audit?.actual_period_start ? escapeHtml(`${audit.actual_period_start} to ${audit.actual_period_end}`) : "window unavailable"}</div>
+          <div class="window-grid">
+            <div class="window-metric">
+              <p class="section-label">Beginning Equity</p>
+              <p class="window-value">${escapeHtml(currency(startEquity, 2))}</p>
+            </div>
+            <div class="window-metric">
+              <p class="section-label">Ending Equity</p>
+              <p class="window-value ${metricToneClass(equityDelta, "positive", "negative")}">${escapeHtml(currency(finalEquity, 2))}</p>
+            </div>
+            <div class="window-metric">
+              <p class="section-label">Sharpe</p>
+              <p class="window-value">${escapeHtml(fmt(number(details?.sharpe), 3))}</p>
+            </div>
+            <div class="window-metric">
+              <p class="section-label">Max Drawdown</p>
+              <p class="window-value">${escapeHtml(pct(Math.abs(number(details?.max_drawdown))))}</p>
+            </div>
+            <div class="window-metric">
+              <p class="section-label">CAGR</p>
+              <p class="window-value ${metricToneClass(number(details?.cagr), "positive", "negative")}">${escapeHtml(signedPct(number(details?.cagr)))}</p>
+            </div>
+            <div class="window-metric">
+              <p class="section-label">Executed Trades</p>
+              <p class="window-value">${escapeHtml(String(number(audit?.trade_count)))}</p>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function evidenceCard(label, copy, href) {
+      return `
+        <article class="evidence-card">
+          <p class="section-label">${escapeHtml(label)}</p>
+          <p class="framework-copy">${escapeHtml(copy)}</p>
+          ${href ? `<a class="evidence-link" href="${safeHref(href)}" target="_blank" rel="noreferrer">Open Artifact</a>` : `<span class="evidence-link" style="opacity:0.56;border-color:transparent;">Artifact Unavailable</span>`}
+        </article>
+      `;
+    }
+
+    function frameworkCard(label, copy) {
+      return `
+        <article class="framework-card">
+          <h3 class="framework-title">${escapeHtml(label)}</h3>
+          <p class="framework-copy">${escapeHtml(copy)}</p>
+        </article>
+      `;
+    }
+
+    function renderAuditRail(row) {
+      if (!row) {
+        els.auditRail.innerHTML = `
+          <section class="audit-section">
+            <h2 class="audit-heading">Audit Rail</h2>
+            <p class="framework-copy">No visible candidate. Adjust the grid configuration to restore proof surfaces.</p>
+          </section>
+        `;
+        return;
+      }
+
+      const confidence = confidenceLabel(row);
+      const command = actualCommand(row);
+      els.auditRail.innerHTML = `
+        <section class="audit-section">
+          <h2 class="audit-heading">Audit Rail</h2>
+          <article class="command-card" id="reproducible-command">
+            <p class="command-label">// Reproducible Command</p>
+            <pre class="command-shell">${escapeHtml(command)}</pre>
+            <div class="command-links">
+              <a class="evidence-link" href="${safeHref(row.source)}" target="_blank" rel="noreferrer">View Source</a>
+              ${row.train_audit ? `<a class="evidence-link" href="${safeHref(row.train_audit.artifact_path)}" target="_blank" rel="noreferrer">Train Audit</a>` : ""}
+              ${row.test_audit ? `<a class="evidence-link" href="${safeHref(row.test_audit.artifact_path)}" target="_blank" rel="noreferrer">Test Audit</a>` : ""}
+            </div>
+          </article>
+        </section>
+
+        <section class="audit-section">
+          <article class="mental-model-card">
+            <p class="section-label">Mental Model Synthesis</p>
+            <h3 class="mental-model-subhead">${escapeHtml(hypothesisHeadline(row))}</h3>
+            <p class="mental-model-copy">${escapeHtml(row.rationale)}</p>
+            <h3 class="mental-model-subhead">Structural Integrity</h3>
+            <p class="mental-model-copy">${escapeHtml(row.critical_evaluation)}</p>
+          </article>
+        </section>
+
+        <section class="audit-section" id="system-telemetry">
+          <p class="section-label">System Telemetry</p>
+          <div class="telemetry-stack">
+            <div class="telemetry-row">
+              <span class="telemetry-key">Last Discovery Sync</span>
+              <span class="telemetry-value">${escapeHtml(formatTime(REPORT_META.generated_date))}</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Train Trades</span>
+              <span class="telemetry-value">${escapeHtml(String(number(row.train_audit?.trade_count)))}</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Test Trades</span>
+              <span class="telemetry-value">${escapeHtml(String(number(row.test_audit?.trade_count)))}</span>
+            </div>
+            <div class="telemetry-row">
+              <span class="telemetry-key">Curator Confidence</span>
+              <span class="telemetry-value ${escapeHtml(confidence.tone)}">${escapeHtml(confidence.label)}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="audit-section" id="execution-windows">
+          <p class="section-label">Execution Windows</p>
+          <div class="window-stack">
+            ${windowCard("Train Window", row.train_details, row.train_audit, REPORT_META.train_start, REPORT_META.train_end)}
+            ${windowCard("Test Window", row.test_details, row.test_audit, REPORT_META.test_start, REPORT_META.test_end)}
+          </div>
+        </section>
+
+        <section class="audit-section" id="evidence-links">
+          <p class="section-label">Evidence Links</p>
+          <div class="evidence-stack">
+            ${evidenceCard("Research Source", `Original lead from ${domainLabel(row.source)}.`, row.source)}
+            ${evidenceCard("Train Audit", row.train_audit ? `${row.train_audit.trade_count} trades with saved JSON execution trail.` : "Train audit artifact not available.", row.train_audit?.artifact_path)}
+            ${evidenceCard("Test Audit", row.test_audit ? `${row.test_audit.trade_count} trades with saved JSON execution trail.` : "Test audit artifact not available.", row.test_audit?.artifact_path)}
+          </div>
+        </section>
+
+        <section class="audit-section">
+          <p class="section-label">Research Analysis Framework</p>
+          <div class="framework-stack">
+            ${frameworkCard("Trading Strategy", row.strategy_description)}
+            ${frameworkCard("Asset Universe & Inputs / Outputs", row.investment_rationale)}
+            ${frameworkCard("Rust Backtest Architecture", row.backtest_architecture)}
+          </div>
+        </section>
+      `;
+    }
+
+    function populateFilterOptions() {
+      const assets = [...new Set(REPORT_ROWS.map((row) => row.focus_asset))].sort();
+      const rules = [...new Set(REPORT_ROWS.map((row) => row.rule))].sort();
+      els.assetFilter.innerHTML = ['<option value="all">All Assets</option>', ...assets.map((asset) => `<option value="${escapeHtml(asset)}">${escapeHtml(asset)}</option>`)].join("");
+      els.ruleFilter.innerHTML = ['<option value="all">All Rules</option>', ...rules.map((rule) => `<option value="${escapeHtml(rule)}">${escapeHtml(humanizeRule(rule))}</option>`)].join("");
+    }
+
+    function scrollToId(id) {
+      const node = document.getElementById(id);
+      if (!node) return;
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function toggleConfig(open = !state.configOpen) {
+      state.configOpen = open;
+      render();
+      if (open) {
+        requestAnimationFrame(() => {
+          els.search.focus();
+        });
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "absolute";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+      } finally {
+        textarea.remove();
+      }
+    }
+
+    async function copyCurrentCommand() {
+      const rows = filteredRows();
+      const selected = selectedRow(rows);
+      const fallbackRow = REPORT_ROWS[0] || null;
+      const row = selected || fallbackRow;
+      if (!row) return;
+      const command = actualCommand(row);
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(command);
+        } else {
+          fallbackCopy(command);
+        }
+      } catch {
+        fallbackCopy(command);
+      }
+
+      const original = els.copyCommandButton.textContent;
+      els.copyCommandButton.textContent = "Command Copied";
+      els.copyCommandButton.classList.add("is-copied");
+      window.setTimeout(() => {
+        els.copyCommandButton.textContent = original;
+        els.copyCommandButton.classList.remove("is-copied");
+      }, 1600);
+    }
+
+    function bindEvents() {
+      els.search.addEventListener("input", () => {
+        state.query = els.search.value;
+        render();
+      });
+
+      els.assetFilter.addEventListener("change", () => {
+        state.asset = els.assetFilter.value;
+        render();
+      });
+
+      els.ruleFilter.addEventListener("change", () => {
+        state.rule = els.ruleFilter.value;
+        render();
+      });
+
+      els.seedFilter.addEventListener("change", () => {
+        state.origin = els.seedFilter.value;
+        render();
+      });
+
+      els.sortBy.addEventListener("change", () => {
+        state.sort = els.sortBy.value;
+        render();
+      });
+
+      els.toggleConfig.addEventListener("click", () => {
+        toggleConfig();
+      });
+
+      els.copyCommandButton.addEventListener("click", () => {
+        copyCurrentCommand();
+      });
+
+      els.resultsGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-candidate-id]");
+        if (!button) return;
+        state.selectedId = button.dataset.candidateId;
+        render();
+      });
+
+      els.navWindows.addEventListener("click", () => {
+        scrollToId("execution-windows");
+      });
+
+      els.navConfig.addEventListener("click", () => {
+        toggleConfig(true);
+        scrollToId("configuration-panel");
+      });
+
+      els.footerSettings.addEventListener("click", () => {
+        toggleConfig(true);
+        scrollToId("configuration-panel");
+      });
+    }
+
+    function render() {
+      const rows = filteredRows();
+      const selected = selectedRow(rows);
+      renderHero(rows, selected);
+      renderMetrics(rows, selected);
+      renderVector(rows, selected || REPORT_ROWS[0] || null);
+      renderFilterStrip(rows, selected);
+      renderResultsMeta(rows, selected);
+      renderResults(rows);
+      renderAuditRail(selected);
+      document.title = `zonk Strategy Frontier · ${rows.length} visible`;
+    }
+
+    populateFilterOptions();
+    bindEvents();
+    render();
+  </script>
+</body>
+</html>

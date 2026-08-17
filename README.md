@@ -1,6 +1,6 @@
 # zonk
 
-![zonk](.github/hero.png)
+![zonk]()
 
 Quantitative strategy research and backtesting CLI. Reads all price data from local `~/market-warehouse/` parquet files — no external API calls for price data.
 
